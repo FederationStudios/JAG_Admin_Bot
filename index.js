@@ -75,10 +75,10 @@ client.once("ready", async () => {
   }
   console.info("[MDL-LOAD] Loaded modals");
 
-  await client.application.commands.set(globalCommands); //global commands (punishmentsubmission and backgroundcheckrequest)
-  //await client.guilds.cache.get("960952766350639154").commands.set(staffCommands); 
-  await client.guilds.cache.get("960952766350639154").commands.set(staffCommands); // this should be for FSS, suman add the FSS guild id here
-  await client.guilds.cache.get("1266109471944478831").commands.set(mpcommands);
+// Register commands in different guilds
+    await client.guilds.cache.get("960952766350639154").commands.set(globalCommands);
+    await client.guilds.cache.get("980675269541134386").commands.set(staffCommands);
+    await client.guilds.cache.get("1266109471944478831").commands.set(mpcommands);
   ready = true;
   toConsole("Client has logged in and is ready", new Error().stack, client);
 

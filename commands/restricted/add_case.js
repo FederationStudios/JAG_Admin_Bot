@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, Client, CommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const Case = require('../../DBModels/Case');
+const { encryptData } = require('../../utils/encryptionUtils'); 
 
 module.exports = {
     name: 'add_case',
@@ -154,6 +155,10 @@ module.exports = {
                     break;
             }
 
+            // Encrypt usernames before saving
+            const encryptedRobloxUsername = encryptData(robloxUsername);
+            const encryptedDiscordUsername = encryptData(discordUsername);
+
             const caseId = `${caseIdPrefix}/${divisionPrefix}/${caseCount.toString().padStart(3, '0')}`;
 
             // Create an embed with case details
@@ -210,8 +215,8 @@ module.exports = {
                     // Create a new case document
                     const newCase = new Case({
                         case_id: caseId,
-                        roblox_username: robloxUsername,
-                        discord_username: discordUsername,
+                        roblox_username: encryptedRobloxUsername,
+                        discord_username: encryptedDiscordUsername,
                         prosecuting_authority: prosecutingAuthority,
                         division: division,
                         court_martial_type: courtMartialType,

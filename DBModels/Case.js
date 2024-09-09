@@ -8,12 +8,12 @@ const caseSchema = new mongoose.Schema({
     unique: true,
   },
   roblox_username: {
-    type: String,
-    required: true,
+    iv: { type: String, required: true },
+    encryptedData: { type: String, required: true }
   },
-  discord_username: {
-    type: String,
-    required: true,
+ discord_username: {
+  iv: { type: String, required: true },
+  encryptedData: { type: String, required: true }
   },
   division: {
     type: String,

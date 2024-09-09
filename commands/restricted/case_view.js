@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { Client, CommandInteraction, EmbedBuilder } = require('discord.js');
 const case_list = require('../../DBModels/Case.js');
 const { interactionEmbed, paginationEmbed } = require('../../functions.js'); // Import paginationEmbed
+const { decryptData } = require('../../utils/encryptionUtils.js');
 
 module.exports = {
     name: 'case_view',
@@ -16,13 +17,12 @@ module.exports = {
     async run(client, interaction) {
         await interaction.deferReply();
 
-        // Check if the user has appropriate permissions (CoA Leadership)
-        const requiredRoles = ['964465282120830986', '1083095989323313242', '1083096092356391043'];
-
-        const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
-        if (!hasRole) {
-          return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command, buddy.`, interaction, client, [true, 30]);
-        }
+        // // Check if the user has appropriate permissions (CoA Leadership)
+        // const requiredRoles = ['964465282120830986', '986502215743189062', '1083096092356391043'];
+        // const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        // if (!hasRole) {
+        //   return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command, buddy.`, interaction, client, [true, 30]);
+        // }
 
         try {
             // Fetch all cases from the database
@@ -31,7 +31,7 @@ module.exports = {
             const pageSize = 5;
 
             if (!cases || cases.length === 0) {
-                return interactionEmbed(3, "No cases found", "", interaction, client, [true, 15]);
+                return interactionEmbed(4, "No cases found", "", interaction, client, [true, 15]);
             }
 
             // Create pages of embeds
@@ -47,8 +47,16 @@ module.exports = {
                     });
 
                 casesPage.forEach(caseData => {
+                    // Decrypt the usernames before displaying them
+                    const decryptedRobloxUsername = caseData.roblox_username 
+                        ? decryptData(caseData.roblox_username.encryptedData, caseData.roblox_username.iv) 
+                        : 'N/A';
+                    const decryptedDiscordUsername = caseData.discord_username 
+                        ? decryptData(caseData.discord_username.encryptedData, caseData.discord_username.iv) 
+                        : 'N/A';
+                        
                     embed.addFields(
-                        { name: `Case ID: ${caseData.case_id}`, value: `**Roblox Username:** ${caseData.roblox_username || 'N/A'}\n**Discord Username:** ${caseData.discord_username || 'N/A'}\n**Status:** ${caseData.case_status || 'N/A'}\n**Prosecuting Authority:** ${caseData.prosecuting_authority || 'N/A'}\n**Division:** ${caseData.division || 'N/A'}` }
+                        { name: `Case ID: ${caseData.case_id}`, value: `**Roblox Username:** ${decryptedRobloxUsername}\n**Discord Username:** ${decryptedDiscordUsername}\n**Status:** ${caseData.case_status || 'N/A'}\n**Prosecuting Authority:** ${caseData.prosecuting_authority || 'N/A'}\n**Division:** ${caseData.division || 'N/A'}` }
                     );
 
                     if (caseData.judges_assigned) {
@@ -64,6 +72,7 @@ module.exports = {
             // Use paginationEmbed function to handle embeds with pagination
             await paginationEmbed(interaction, embeds);
         } catch (error) {
+            console.error(error); // Log the error to debug
             return interactionEmbed(3, "[ERR-ARGS]", "An error occurred while fetching the records", interaction, client, [true, 15]);
         }
     }
