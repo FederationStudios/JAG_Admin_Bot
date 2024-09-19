@@ -52,7 +52,7 @@ client.once("ready", async () => {
     return commandsArray;
   };
 
-  const globalCommands = loadCommands(path.join(__dirname, "commands", "public"),"PUBLIC");
+  const jagcommands = loadCommands(path.join(__dirname, "commands", "public"),"PUBLIC");
   const staffCommands = loadCommands(path.join(__dirname, "commands", "restricted"), "STAFF");
   const mpcommands = loadCommands(path.join(__dirname, "commands", "militarypolice"), "MP");
 
@@ -76,7 +76,7 @@ client.once("ready", async () => {
   console.info("[MDL-LOAD] Loaded modals");
 
 // Register commands in different guilds
-    await client.guilds.cache.get("960952766350639154").commands.set(globalCommands);
+    await client.guilds.cache.get("960952766350639154").commands.set(jagcommands);
     await client.guilds.cache.get("980675269541134386").commands.set(staffCommands);
     await client.guilds.cache.get("1266109471944478831").commands.set(mpcommands);
   ready = true;

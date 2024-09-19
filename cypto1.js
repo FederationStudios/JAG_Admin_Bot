@@ -17,17 +17,17 @@
 //     return decrypted.toString();
 // }
 
-// Example usage
-const dataToEncrypt = "suman9725";
-const encrypted = encryptData(dataToEncrypt);
-console.log(encrypted.iv)
-console.log(encrypted.encryptedData)
-//  Storing  encrypted.encryptedData and `encrypted.iv in the database
+// // Example usage
+// const dataToEncrypt = "suman9725";
+// const encrypted = encryptData(dataToEncrypt);
+// console.log(encrypted.iv)
+// console.log(encrypted.encryptedData)
+// //  Storing  encrypted.encryptedData and `encrypted.iv in the database
 
-// When retrieving from the database (we can just generate our own static key and use it!!!)
-const decryptedData = decryptData(encrypted.encryptedData, encrypted.iv);
+// // When retrieving from the database (we can just generate our own static key and use it!!!)
+// const decryptedData = decryptData(encrypted.encryptedData, encrypted.iv);
 
-console.log(decryptedData); // Output stuuffs
+// console.log(decryptedData); // Output stuuffs
 
 // Generate a 32-byte (256-bit) key
 const key = crypto.randomBytes(32);
