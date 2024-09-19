@@ -52,33 +52,16 @@ client.once("ready", async () => {
     return commandsArray;
   };
 
-  const jagcommands = loadCommands(path.join(__dirname, "commands", "public"),"PUBLIC");
+  const globalCommands = loadCommands(path.join(__dirname, "commands", "public"),"PUBLIC");
   const staffCommands = loadCommands(path.join(__dirname, "commands", "restricted"), "STAFF");
   const mpcommands = loadCommands(path.join(__dirname, "commands", "militarypolice"), "MP");
 
-  //Modals
-  const modals = fs.readdirSync("./modals").filter(file => file.endsWith(".js"));
-  console.info(`[MDL-LOAD] Loading modals, expecting ${modals.length} modals`);
-  for (let file of modals) {
-    try {
-      console.info(`[MDL-LOAD] Loading file ${file}`);
-      let modal = require(`./modals/${file}`);
-
-      if (modal.name) {
-        console.info(`[MDL-LOAD] Loaded: ${file}`);
-        client.modals.set(modal.name, modal);
-      }
-    } catch (e) {
-      console.warn(`[MDL-LOAD] Unloaded: ${file}`);
-      console.warn(`[MDL-LOAD] ${e}`);
-    }
-  }
-  console.info("[MDL-LOAD] Loaded modals");
 
 // Register commands in different guilds
-    await client.guilds.cache.get("960952766350639154").commands.set(jagcommands);
-    await client.guilds.cache.get("980675269541134386").commands.set(staffCommands);
-    await client.guilds.cache.get("1266109471944478831").commands.set(mpcommands);
+    await client.application.commands.set(globalCommands);
+    
+    await client.guilds.cache.get("960952766350639154").commands.set(staffCommands);
+    await client.guilds.cache.get("989558770801737778").commands.set(mpcommands);
   ready = true;
   toConsole("Client has logged in and is ready", new Error().stack, client);
 
@@ -187,9 +170,4 @@ process.on("exit", (code) => {
   console.error(`[EXIT] Code: ${code}`);
 
 });
-
-
-
-
-
-//#endregion
+//#region endregion

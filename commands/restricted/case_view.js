@@ -14,8 +14,9 @@ module.exports = {
      * @param {Client} client
      * @param {CommandInteraction} interaction
      */
-    async run(client, interaction) {
-        await interaction.deferReply();
+    run: async (client, interaction) => {
+        
+        await interaction.deferReply({ephemeral:true});
 
         // // Check if the user has appropriate permissions (CoA Leadership)
         // const requiredRoles = ['964465282120830986', '986502215743189062', '1083096092356391043'];

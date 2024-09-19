@@ -1,8 +1,10 @@
 const { SlashCommandBuilder, CommandInteractionOptionResolver, CommandInteraction } = require('discord.js');
-const Case = require('../../DBModels/case_list'); // Adjust the path to your case model
-const { interactionEmbed } = require('../../functions'); // Assume you have a function to create embeds
+const Case = require('../../DBModels/Case'); // Adjust the path to your case model
+const { decryptData } = require('../../utils/encryptionUtils.js');
 
 module.exports = {
+    name: "case_details",
+    description: "View details of a specific case by Case ID.",
     data: new SlashCommandBuilder()
         .setName('view_case')
         .setDescription('View details of a specific case by Case ID.')
@@ -16,7 +18,7 @@ module.exports = {
      * @param {CommandInteraction} interaction
      * @param {CommandInteractionOptionResolver} options
      */    
-    run: async(interaction) => {
+    run: async(interaction,client,options) => {
         const caseId = interaction.options.getString('case_id');
         
         await interaction.deferReply({ephemeral:true});
@@ -30,8 +32,12 @@ module.exports = {
             }
 
             // Decrypt the Roblox and Discord usernames (assuming you have a decrypt function)
-            const decryptedRobloxUsername = decrypt(caseDetails.roblox_username);
-            const decryptedDiscordUsername = decrypt(caseDetails.discord_username);
+            const decryptedRobloxUsername = caseDetails.roblox_username 
+            ? decryptData(caseDetails.roblox_username.encryptedData, caseDetails.roblox_username.iv) 
+            : 'N/A';
+        const decryptedDiscordUsername = caseDetails.discord_username 
+            ? decryptData(caseDetails.discord_username.encryptedData, caseDetails.discord_username.iv) 
+            : 'N/A';
 
             // Create an embed with all case details
             const caseEmbed = {

@@ -15,7 +15,7 @@
     "jag_administration_bot": "file:",
     "mongoose": "^8.5.2",
     "noblox.js": "^5.0.1",
-    "node-fetch": "^2.6.7"
+    "punycode": "^2.3.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
