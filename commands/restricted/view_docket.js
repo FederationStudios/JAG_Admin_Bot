@@ -17,12 +17,6 @@ module.exports = {
     async run(client, interaction) {
         await interaction.deferReply();
 
-        // const requiredRoles = ['964465282120830986', '1083095989323313242', '1083096092356391043'];
-        // const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
-
-        // if (!hasRole) {
-        //     return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command.`, interaction, client, [true, 30]);
-        // }
         
         try {
             const cases = await case_list.find({ case_status: { $in: ['Accepted', 'Awaiting Assignment of Judge', 'Awaiting Approval from JAG Command'] } });

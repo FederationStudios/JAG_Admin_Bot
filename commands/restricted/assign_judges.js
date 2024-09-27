@@ -28,13 +28,8 @@ module.exports = {
      * @param {CommandInteractionOptionResolver} options
      */
     run: async(client, interaction, options) => {
-       // Check if the user has appropriate permissions (CoA Leadership)
-      // const requiredRoles = ['1019717342227333192', '1083095989323313242', '1083096092356391043', '1270040254891692152'];
 
-    //    const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
-    //    if (!hasRole) {
-    //      return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command, buddy.`, interaction, client, [true, 30]);
-    //    }
+        await interaction.deferReply({ephemeral:true});
 
         const caseId = interaction.options.getString('case_id');
         const judgesAssigned = interaction.options.getBoolean('judges_assigned');
@@ -58,10 +53,10 @@ module.exports = {
                 return interaction.reply({ content: `No case found with ID ${caseId}.`, ephemeral: true });
             }
 
-            await interaction.reply({ content: `The case with ID ${caseId} has been updated successfully.`, ephemeral: true });
+            await interaction.editReply({ content: `The case with ID ${caseId} has been updated successfully.`, ephemeral: true });
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: 'An error occurred while assigning judges to the case.', ephemeral: true });
+            await interaction.editReply({ content: 'An error occurred while assigning judges to the case.', ephemeral: true });
         }
     }
 };

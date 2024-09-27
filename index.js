@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, InteractionType, ActivityType, Collection } = require("discord.js");
+const { Client, GatewayIntentBits, InteractionType, ActivityType, Collection, EmbedBuilder } = require("discord.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v10");
 const { interactionEmbed, toConsole } = require("./functions.js");
 const fs = require("node:fs");
@@ -10,6 +10,9 @@ const path = require("path");
 
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent] });
+
+let statusMessage; // Variable to store the status message
+
 client.commands = new Collection();
 client.modals = new Collection();
 
@@ -63,6 +66,23 @@ client.once("ready", async () => {
     await client.guilds.cache.get("960952766350639154").commands.set(staffCommands);
     await client.guilds.cache.get("989558770801737778").commands.set(mpcommands);
   ready = true;
+  
+  console.log(`${client.user.tag} is online!`);
+
+  const embed = new EmbedBuilder()
+      .setColor('Green')
+      .setTitle('Bot Status')
+      .setDescription('The bot is **Online**.')
+      .setTimestamp()
+      .setFooter({ text: 'Bot Status', iconURL: client.user.displayAvatarURL() });
+
+  // Fetch the channel where the status will be posted
+  const channel = await client.channels.cache.get(config.discord.statusChannelID);
+
+  // Send the embed to the channel
+  statusMessage = await channel.send({ embeds: [embed] });
+
+  console.log('Status message posted.');
   toConsole("Client has logged in and is ready", new Error().stack, client);
 
 });
@@ -169,5 +189,43 @@ process.on("exit", (code) => {
   console.error("[EXIT] The process is exiting!");
   console.error(`[EXIT] Code: ${code}`);
 
+});
+// Listen for process shutdown (e.g., CTRL+C or server shutdown)
+process.on('SIGINT', async () => {
+  console.log('Bot is going offline...');
+
+  // Update the embed to indicate offline status
+  if (statusMessage) {
+      const embed = new EmbedBuilder()
+          .setColor('Red')
+          .setTitle('Bot Status')
+          .setDescription('The bot is **Offline**.')
+          .setTimestamp()
+          .setFooter({ text: 'Bot Status', iconURL: client.user.displayAvatarURL() });
+
+      await statusMessage.edit({ embeds: [embed] });
+      console.log('Status message updated to offline.');
+  }
+
+  process.exit(); // Exit the process
+});
+
+process.on('SIGTERM', async () => {
+  console.log('Bot is going offline...');
+
+  // Update the embed to indicate offline status
+  if (statusMessage) {
+      const embed = new EmbedBuilder()
+          .setColor('Red')
+          .setTitle('Bot Status')
+          .setDescription('The bot is **Offline**.')
+          .setTimestamp()
+          .setFooter({ text: 'Bot Status', iconURL: client.user.displayAvatarURL() });
+
+      await statusMessage.edit({ embeds: [embed] });
+      console.log('Status message updated to offline.');
+  }
+
+  process.exit(); // Exit the process
 });
 //#region endregion

@@ -35,6 +35,9 @@ module.exports = {
      * @param {CommandInteraction} interaction
      */
     run: async(client, interaction) => {
+
+    await interaction.deferReply({ephemeral:true});
+
         try {
             const nominatedUser = interaction.options.getUser('user');
             const division = interaction.options.getString('division');
@@ -75,7 +78,7 @@ module.exports = {
             const requiredRoleName = 'JAG Command'; // Replace with the correct role name
 
             const filter = i => ['approve_nomination', 'reject_nomination'].includes(i.customId);
-            const collector = message.createMessageComponentCollector({ filter, time: 60000 });
+            const collector = message.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 });
 
             collector.on('collect', async i => {
                 const member = await i.guild.members.fetch(i.user.id);

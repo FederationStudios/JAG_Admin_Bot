@@ -18,13 +18,6 @@ module.exports = {
         
         await interaction.deferReply({ephemeral:true});
 
-        // // Check if the user has appropriate permissions (CoA Leadership)
-        // const requiredRoles = ['964465282120830986', '986502215743189062', '1083096092356391043'];
-        // const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
-        // if (!hasRole) {
-        //   return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command, buddy.`, interaction, client, [true, 30]);
-        // }
-
         try {
             // Fetch all cases from the database
             const cases = await case_list.find();
@@ -32,7 +25,7 @@ module.exports = {
             const pageSize = 5;
 
             if (!cases || cases.length === 0) {
-                return interactionEmbed(4, "No cases found", "", interaction, client, [true, 15]);
+                return interaction.editReply("No cases found.")
             }
 
             // Create pages of embeds

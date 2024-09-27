@@ -23,6 +23,9 @@ module.exports = {
      * @param {CommandInteraction} interaction
      */
     run: async(client, interaction) => {
+
+        await interaction.deferReply({ephemeral:true});
+
         try {
             const targetUser = interaction.options.getUser('user');
             const division = interaction.options.getString('division');
@@ -100,11 +103,11 @@ module.exports = {
                 await message.edit({ components: [disabledRow] });
             });
 
-            await interaction.reply({ content: 'Withdrawal request submitted.', ephemeral: true });
+            await interaction.editReply({ content: 'Withdrawal request submitted.', ephemeral: true });
 
         } catch (error) {
             console.error('Error handling withdrawal:', error);
-            await interaction.reply({ content: 'There was an error while processing your withdrawal request.', ephemeral: true });
+            await interaction.editReply({ content: 'There was an error while processing your withdrawal request.', ephemeral: true });
         }
     },
 };

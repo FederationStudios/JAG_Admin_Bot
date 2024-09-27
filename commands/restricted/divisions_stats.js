@@ -34,7 +34,7 @@ module.exports = {
 
             // Add each division and its case count to the embed
             divisionCounts.forEach(division => {
-                embed.addFields({ name: `${division._id}`, value: `${division.count} cases`, inline: true });
+                embed.addFields({ name: `${division._id}`, value: `${division.count} cases`, inline: false });
             });
 
             // Send the embed response
