@@ -19,13 +19,13 @@ client.modals = new Collection();
 //#region Events
 client.once("ready", async () => {
   // Start of Bot Status
-  client.user.setActivity("All memebrs!", { type: ActivityType.Watching });
+  client.user.setActivity("Military cases and trials...", { type: ActivityType.Watching });
   //End of bot status
 
   main().catch(err => console.log(err));
   async function main() {
     try {
-      await mongoose.connect(config.bot.uri);
+      await mongoose.connect(config.bot.uri1);
       console.log("Database connection established!");
     } catch (err) {
       console.log("Failed to connect to database: " + err);
@@ -63,8 +63,8 @@ client.once("ready", async () => {
 // Register commands in all guilds
     await client.application.commands.set(globalCommands);
 // Register commands in different guilds   
-    await client.guilds.cache.get("960952766350639154").commands.set(staffCommands);
-    await client.guilds.cache.get("989558770801737778").commands.set(mpcommands);
+    await client.guilds.cache.get("1267844279129341994").commands.set(staffCommands);
+    await client.guilds.cache.get("493315283574980628").commands.set(mpcommands);
   ready = true;
   
   console.log(`${client.user.tag} is online!`);

@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, Colors, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
-const nbx = require('noblox.js');
 
 module.exports = {
     name: 'file_an_appeal',
@@ -64,26 +63,13 @@ module.exports = {
             const offensesAdjudicated = interaction.options.getString('offenses_adjudicated');
             const linkAttachment = interaction.options.getString('google_docs_link') || 'No link provided';
 
-            let id;
-            try {
-                id = await nbx.getIdFromUsername(subject);
-            } catch (error) {
-                return interaction.editReply({ content: `Error: Unable to find user \`${subject}\` on Roblox.`, ephemeral: true });
-            }
-            
-            const info = await nbx.getPlayerInfo(id);
-            const avatar = await fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${id}&size=720x720&format=Png&isCircular=false`)
-                .then(r => r.json())
-                .then(r => r.data[0].imageUrl);
-
             const embed = new EmbedBuilder()
                 .setTitle('Appeal Filed')
-                .setThumbnail(avatar)
                 .setColor(Colors.Red)
                 .addFields(
                     { name: 'Discord Tag', value: interaction.user.tag },
                     { name: 'Discord ID', value: interaction.user.id },
-                    { name: 'Subject', value: `[${info.username}](https://www.roblox.com/users/${id}/profile)`, inline: false },
+                    { name: 'Subject', value: subject, inline: false },
                     { name: 'Prosecuting Authority', value: prosecutingAuthority, inline: false },
                     { name: 'Court Martial Type', value: courtMartialType, inline: false },
                     { name: 'Offenses Adjudicated', value: offensesAdjudicated, inline: false },

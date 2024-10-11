@@ -202,14 +202,14 @@ module.exports = {
             const row = new ActionRowBuilder()
                 .addComponents(approveButton, rejectButton);
 
-            const channel = interaction.client.channels.cache.get('1265982268162183178'); // Replace with the correct channel ID
+            const channel = interaction.client.channels.cache.get('1272800122601865256'); // Replace with the correct channel ID
             const message = await channel.send({ embeds: [embed], components: [row] });
 
             //Role perms to approve or deny the add_case
             const requiredRoleIds = ['1275671875216867398', '1275671964324728833'];
 
             const filter = i => ['approve_case', 'reject_case'].includes(i.customId);
-            const collector = message.createMessageComponentCollector({ filter, time: 60000 });
+            const collector = message.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 });
 
             collector.on('collect', async i => {
                 //For role perms check

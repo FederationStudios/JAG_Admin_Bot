@@ -70,7 +70,7 @@ module.exports = {
             const channel = interaction.client.channels.cache.get('1272800122601865256'); // Replace with the correct channel ID
 
             // Correctly mention the user or role
-            await channel.send(`<@${notifyUserId}> someone has requested nomination roles.`);
+            await channel.send(`<@&${notifyUserId}> someone has requested nomination roles.`);
 
             const message = await channel.send({ embeds: [embed], components: [row] });
 
