@@ -60,9 +60,9 @@ client.once("ready", async () => {
   const mpcommands = loadCommands(path.join(__dirname, "commands", "militarypolice"), "MP");
 
 
-// Register commands in different guilds
+// Register commands in all guilds
     await client.application.commands.set(globalCommands);
-    
+// Register commands in different guilds   
     await client.guilds.cache.get("960952766350639154").commands.set(staffCommands);
     await client.guilds.cache.get("989558770801737778").commands.set(mpcommands);
   ready = true;

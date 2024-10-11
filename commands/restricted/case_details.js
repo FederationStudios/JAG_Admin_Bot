@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, CommandInteractionOptionResolver, CommandInteraction } = require('discord.js');
 const Case = require('../../DBModels/Case'); // Adjust the path to your case model
 const { decryptData } = require('../../utils/encryptionUtils.js');
+const {interactionEmbed} = require("../../functions.js");
+const { requiredRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: "case_details",
@@ -22,6 +24,11 @@ module.exports = {
         const caseId = interaction.options.getString('case_id');
         
         await interaction.deferReply({ephemeral:true});
+
+        const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
 
         try {
             // Find the case by case_id

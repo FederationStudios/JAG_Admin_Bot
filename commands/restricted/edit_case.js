@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
 const Case = require('../../DBModels/Case'); // Adjust the path to your case model
-//const { interactionEmbed } = require("../../functions");
+const { interactionEmbed } = require("../../functions");
+const { requiredRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: "edit_case",
@@ -110,14 +111,10 @@ module.exports = {
     run: async (client, interaction, options) => {
 
         await interaction.deferReply({ ephemeral: false });
-
-        // const requiredRoles = ['1019717342227333192', '984517042671599676', '1270040254891692152'];
-
-        // const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
-        // if (!hasRole) {
-        //     return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command, buddy.`, interaction, client, [true, 30]);
-        // }
-
+        const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
         const subcommand = options.getSubcommand();
         const caseId = options.getString("case_id");
         let updateData = {};

@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Case = require('../../DBModels/Case');
+const {interactionEmbed} = require("../../functions.js");
+const { mpRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: "divisions_stats",
@@ -13,6 +15,11 @@ module.exports = {
      */
     run: async (client, interaction) => {
         await interaction.deferReply();
+
+        const hasRole = mpRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
 
         try {
             // Aggregate cases by division and count

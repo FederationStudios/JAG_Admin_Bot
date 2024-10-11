@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, Colors, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
 const nbx = require('noblox.js');
+const {interactionEmbed} = require("../../functions.js");
+const { mpRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: 'file_a_charges',
@@ -48,6 +50,11 @@ module.exports = {
         try {
             await interaction.deferReply({ ephemeral: true });
 
+            const hasRole = mpRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
+
             const username = interaction.options.getString('your_username');
             const subject = interaction.options.getString('subject');
             const courtMartial = interaction.options.getString('court_martial');
@@ -72,7 +79,7 @@ module.exports = {
             }
 
             const logChannel = interaction.client.channels.cache.get('1265982268162183178'); // Replace with the correct channel ID
-            await logChannel.send({ embeds: [embed] });
+            await logChannel.send({ embeds: [embed], content: `Wakey Wakey noobs new File Appeal charges from MP!` });
 
             await interaction.editReply({ content: 'The charges have been filed and sent to the appropriate channels.' });
 

@@ -3,6 +3,7 @@ const { Client, CommandInteraction, EmbedBuilder } = require('discord.js');
 const case_list = require('../../DBModels/Case.js');
 const { interactionEmbed, paginationEmbed } = require('../../functions.js');
 const { decryptData } = require('../../utils/encryptionUtils.js');
+const { requiredRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: 'view_docket',
@@ -16,7 +17,11 @@ module.exports = {
      */
     async run(client, interaction) {
         await interaction.deferReply();
-
+        
+        const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
         
         try {
             const cases = await case_list.find({ case_status: { $in: ['Accepted', 'Awaiting Assignment of Judge', 'Awaiting Approval from JAG Command'] } });

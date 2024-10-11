@@ -3,6 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
 const case_list = require('../../DBModels/Case');
 const { interactionEmbed } = require("../../functions");
+const { requiredRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: 'assign_judges',
@@ -30,6 +31,11 @@ module.exports = {
     run: async(client, interaction, options) => {
 
         await interaction.deferReply({ephemeral:true});
+
+        const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
 
         const caseId = interaction.options.getString('case_id');
         const judgesAssigned = interaction.options.getBoolean('judges_assigned');

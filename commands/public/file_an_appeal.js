@@ -54,6 +54,10 @@ module.exports = {
         try {
             await interaction.deferReply({ ephemeral: true });
 
+            if (interaction.channel.id !== "1266061997242585289") {
+                return await interaction.editReply({ content: "This command can only be used in <#1266061997242585289>", ephemeral: true });
+            }
+
             const subject = interaction.options.getString('subject');
             const prosecutingAuthority = interaction.options.getString('prosecuting_authority');
             const courtMartialType = interaction.options.getString('court_martial_type');

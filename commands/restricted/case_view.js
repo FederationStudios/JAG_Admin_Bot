@@ -3,6 +3,7 @@ const { Client, CommandInteraction, EmbedBuilder } = require('discord.js');
 const case_list = require('../../DBModels/Case.js');
 const { interactionEmbed, paginationEmbed } = require('../../functions.js'); // Import paginationEmbed
 const { decryptData } = require('../../utils/encryptionUtils.js');
+const { requiredRoles } = require('../../config.json').discord;
 
 module.exports = {
     name: 'case_view',
@@ -17,7 +18,10 @@ module.exports = {
     run: async (client, interaction) => {
         
         await interaction.deferReply({ephemeral:true});
-
+        const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+        if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+        }
         try {
             // Fetch all cases from the database
             const cases = await case_list.find();
