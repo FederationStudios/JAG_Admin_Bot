@@ -1,0 +1,6 @@
+{
+    "dataworkspace.excludedProjects": [
+        "MTA/MTA.sqlproj",
+        "node_modules/jag_administration_bot/MTA/MTA.sqlproj"
+    ]
+}

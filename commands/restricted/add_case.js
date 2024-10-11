@@ -139,16 +139,16 @@ module.exports = {
                             divisionPrefix = 'IG';
                          break;
                 case 'Military Police':
-                            divisionPrefix = 'IG';
+                            divisionPrefix = 'MP';
                          break;
                 case 'Military Training Academy':
-                            divisionPrefix = 'IG';
+                            divisionPrefix = 'MTA';
                          break;
                 case 'Quartermaster':
-                            divisionPrefix = 'IG';
+                            divisionPrefix = 'QA';
                          break;
                 case 'Administrative & Community Services':
-                            divisionPrefix = 'IG';
+                            divisionPrefix = 'ACS';
                          break;                                               
                 default:
                     divisionPrefix = 'Military Wide';
