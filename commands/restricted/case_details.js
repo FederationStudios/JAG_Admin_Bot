@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, CommandInteractionOptionResolver, CommandInteraction } = require('discord.js');
+const { SlashCommandBuilder, CommandInteractionOptionResolver, CommandInteraction, Colors } = require('discord.js');
 const Case = require('../../DBModels/Case'); // Adjust the path to your case model
 const { decryptData } = require('../../utils/encryptionUtils.js');
 const { interactionEmbed } = require("../../functions.js");
@@ -50,19 +50,19 @@ module.exports = {
 
             // Create an embed for the case details
             const embed = {
-                color: 0x0099ff,
+                color: Colors.Aqua,
                 title: `Case Details - ${caseDetails.case_id}`,
                 fields: [
                     { name: 'Roblox Username', value: decryptedRobloxUsername, inline: true },
-                    { name: 'Discord Username', value: decryptedDiscordUsername, inline: true },
-                    { name: 'Division', value: caseDetails.division || 'N/A', inline: true },
-                    { name: 'Prosecuting Authority', value: caseDetails.prosecuting_authority || 'N/A', inline: true },
-                    { name: 'Court Martial Type', value: caseDetails.court_martial_type || 'N/A', inline: true },
+                    { name: 'Discord Username', value: decryptedDiscordUsername, inline: false },
+                    { name: 'Division', value: caseDetails.division || 'N/A', inline: false },
+                    { name: 'Prosecuting Authority', value: caseDetails.prosecuting_authority || 'N/A', inline: false },
+                    { name: 'Court Martial Type', value: caseDetails.court_martial_type || 'N/A', inline: false },
                     { name: 'Offenses Adjudicated', value: caseDetails.offenses_adjudicated || 'N/A', inline: false },
-                    { name: 'Judges Assigned', value: caseDetails.judges_assigned ? 'Yes' : 'No', inline: true },
-                    { name: 'Judge Username', value: caseDetails.judges_username || 'N/A', inline: true },
-                    { name: 'Submission Date', value: caseDetails.submission_date.toDateString() || 'N/A', inline: true },
-                    { name: 'Case Status', value: caseDetails.case_status || 'N/A', inline: true }
+                    { name: 'Judges Assigned', value: caseDetails.judges_assigned ? 'Yes' : 'No', inline: false },
+                    { name: 'Judge Username', value: caseDetails.judges_username || 'N/A', inline: false },
+                    { name: 'Submission Date', value: caseDetails.submission_date.toDateString() || 'N/A', inline: false },
+                    { name: 'Case Status', value: caseDetails.case_status || 'N/A', inline: false }
                 ],
                 timestamp: new Date(),
                 footer: { text: 'Court Martial System' },
