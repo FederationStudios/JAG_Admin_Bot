@@ -9,7 +9,7 @@ module.exports = {
         .setDescription('File an appeal')
         .addStringOption(option =>
             option.setName('subject')
-                .setDescription('Your roblox username.')
+                .setDescription('Your Roblox username.')
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('prosecuting_authority')
@@ -41,16 +41,16 @@ module.exports = {
             option.setName('offenses_adjudicated')
                 .setDescription('Description of the offenses adjudicated')
                 .setRequired(true))
-        .addAttachmentOption(option =>
-            option.setName('pdf_attachment')
-                .setDescription('Attach the PDF file')
-                .setRequired(true)),
+        .addStringOption(option =>
+            option.setName('google_docs_link')
+                .setDescription('Attach the link file')
+                .setRequired(false)),
     /**
      * @param {Client} client
      * @param {CommandInteraction} interaction
      * @param {CommandInteractionOptionResolver} options
      */            
-    run: async(client, interaction) => {
+    run: async (client, interaction) => {
         try {
             await interaction.deferReply({ ephemeral: true });
 
@@ -58,13 +58,13 @@ module.exports = {
             const prosecutingAuthority = interaction.options.getString('prosecuting_authority');
             const courtMartialType = interaction.options.getString('court_martial_type');
             const offensesAdjudicated = interaction.options.getString('offenses_adjudicated');
-            const pdfAttachment = interaction.options.getAttachment('pdf_attachment');
+            const linkAttachment = interaction.options.getString('google_docs_link') || 'No link provided';
 
             let id;
             try {
                 id = await nbx.getIdFromUsername(subject);
             } catch (error) {
-                return interaction.reply({ content: `Error: Unable to find user \`${subject}\` on Roblox.`, ephemeral: true });
+                return interaction.editReply({ content: `Error: Unable to find user \`${subject}\` on Roblox.`, ephemeral: true });
             }
             
             const info = await nbx.getPlayerInfo(id);
@@ -82,7 +82,8 @@ module.exports = {
                     { name: 'Subject', value: `[${info.username}](https://www.roblox.com/users/${id}/profile)`, inline: false },
                     { name: 'Prosecuting Authority', value: prosecutingAuthority, inline: false },
                     { name: 'Court Martial Type', value: courtMartialType, inline: false },
-                    { name: 'Offenses Adjudicated', value: offensesAdjudicated, inline: false }
+                    { name: 'Offenses Adjudicated', value: offensesAdjudicated, inline: false },
+                    { name: 'Google Link', value: `[Click Here](${linkAttachment})`, inline: false }
                 )
                 .setFooter({ text: `JAG - Secure Transmission | Filed at ${new Date().toLocaleTimeString()} ${new Date().toString().match(/GMT([+-]\d{2})(\d{2})/)[0]}`, iconURL: client.user.displayAvatarURL() });
 
@@ -95,19 +96,24 @@ module.exports = {
                 .addComponents(forwardButton);
 
             const logChannel = interaction.client.channels.cache.get('1265982268162183178'); // Replace with the correct channel ID
-            await logChannel.send({ embeds: [embed], files: [pdfAttachment.url], components: [row] });
-            await interaction.user.send({ embeds: [embed], files: [pdfAttachment.url] });
+            await logChannel.send({ embeds: [embed], components: [row] });
+            await interaction.user.send({ embeds: [embed] });
 
             await interaction.editReply({ content: 'Your appeal has been filed and sent to the appropriate channels.' });
 
             // Button interaction handler
             const filter = i => i.customId === 'forward_to_mp' && i.user.id === interaction.user.id;
-            const collector = logChannel.createMessageComponentCollector({ filter });
+            const collector = logChannel.createMessageComponentCollector({ filter, time: 60000 }); // 1 minute timer for collector
 
             collector.on('collect', async i => {
                 const mpChannel = interaction.client.channels.cache.get('1265982268162183178'); // Replace with the MP channel ID
+                const mpRoleId = '964465282120830986'; // Replace with the correct role ID to ping
+
                 if (mpChannel) {
-                    await mpChannel.send({ embeds: [embed], files: [pdfAttachment.url] });
+                    await mpChannel.send({
+                        content: `Hi, new case incoming <@&${mpRoleId}>!`,
+                        embeds: [embed]
+                    });
 
                     // Update the original message to make the button invisible
                     const updatedRow = new ActionRowBuilder()
@@ -128,7 +134,6 @@ module.exports = {
 
             collector.on('end', collected => {
                 if (collected.size === 0) {
-                    // Optionally notify about unused button if needed
                     logChannel.send({ content: 'The forward button was not used.' });
                 }
             });
@@ -136,7 +141,7 @@ module.exports = {
         } catch (error) {
             console.error('Error handling interaction:', error);
             if (!interaction.replied) {
-                await interaction.reply({ content: 'There was an error while processing your request.', ephemeral: true });
+                await interaction.editReply({ content: 'There was an error while processing your request.', ephemeral: true });
             }
         }
     },
