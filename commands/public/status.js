@@ -15,7 +15,7 @@ module.exports = {
      */
     run: async(client, interaction, options) => {
         const discordUsername = interaction.user.tag; // Get the user's Discord username (e.g., User#1234)
-
+        await interaction.deferReply({ephemeral: true});
         try {
             // Retrieve all cases from the database
             const cases = await case_list.find();
@@ -27,7 +27,7 @@ module.exports = {
             });
 
             if (userCases.length === 0) {
-                return interaction.reply({ content: 'No cases found for your Discord username.', ephemeral: true });
+                return interaction.editReply({ content: 'No cases found for your Discord username.', ephemeral: true });
             }
 
             // Create an array to hold the embed messages
@@ -50,10 +50,10 @@ module.exports = {
                 await interaction.user.send({ embeds: [embed] });
             }
 
-            await interaction.reply({ content: 'I have sent your case details to your DMs.', ephemeral: true });
+            await interaction.editReply({ content: 'I have sent your case details to your DMs.', ephemeral: true });
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: 'An error occurred while fetching your case details.', ephemeral: true });
+            await interaction.editReply({ content: 'An error occurred while fetching your case details.', ephemeral: true });
         }
     }
 };

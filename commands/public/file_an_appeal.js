@@ -54,8 +54,8 @@ module.exports = {
         try {
             await interaction.deferReply({ ephemeral: true });
 
-            if (interaction.channel.id !== "1266061997242585289") {
-                return await interaction.editReply({ content: "This command can only be used in <#1266061997242585289>", ephemeral: true });
+            if (interaction.channel.id !== "1272170550730690592") {
+                return await interaction.editReply({ content: "This command can only be used in <#1272170550730690592>", ephemeral: true });
             }
 
             const subject = interaction.options.getString('subject');
@@ -99,23 +99,21 @@ module.exports = {
             const row = new ActionRowBuilder()
                 .addComponents(forwardButton);
 
-            const logChannel = interaction.client.channels.cache.get('1265982268162183178'); // Replace with the correct channel ID
-            await logChannel.send({ embeds: [embed], components: [row] });
+            const logChannel = interaction.client.channels.cache.get('1272800122601865256'); // Replace with the correct channel ID
+            await logChannel.send({ embeds: [embed], components: [row], content: `hi my dear noobs plz approve this <@&1275671964324728833>` });
             await interaction.user.send({ embeds: [embed] });
 
             await interaction.editReply({ content: 'Your appeal has been filed and sent to the appropriate channels.' });
 
             // Button interaction handler
             const filter = i => i.customId === 'forward_to_mp' && i.user.id === interaction.user.id;
-            const collector = logChannel.createMessageComponentCollector({ filter, time: 60000 }); // 1 minute timer for collector
-
+            const collector = logChannel.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 }); // 7 days for collector
             collector.on('collect', async i => {
-                const mpChannel = interaction.client.channels.cache.get('1265982268162183178'); // Replace with the MP channel ID
-                const mpRoleId = '964465282120830986'; // Replace with the correct role ID to ping
-
+                const mpChannel = interaction.client.channels.cache.get('685141430691561473'); // Replace with the MP channel ID
+            
                 if (mpChannel) {
                     await mpChannel.send({
-                        content: `Hi, new case incoming <@&${mpRoleId}>!`,
+                        content: `Hi, my dear noobs new case incoming get ready oorah!!!!! evaluate and then file charges <@&1139641077796716614> <@&898181248751640676>`,
                         embeds: [embed]
                     });
 

@@ -30,7 +30,7 @@ module.exports = {
             const targetUser = interaction.options.getUser('user');
             const division = interaction.options.getString('division');
             const reasoning = interaction.options.getString('reasoning');
-            const notifyUserId = '964465282120830986'; // Replace with the correct user or role ID
+            const notifyUserId = '1275668326693208146'; // Replace with the correct user or role ID
 
             const embed = new EmbedBuilder()
                 .setTitle('Request to Withdraw Prosecuting Authority Role')
@@ -55,7 +55,7 @@ module.exports = {
             const row = new ActionRowBuilder()
                 .addComponents(approveButton, rejectButton);
 
-            const channel = interaction.client.channels.cache.get('960952766350639157'); // Replace with the correct channel ID
+            const channel = interaction.client.channels.cache.get('1272800122601865256'); // Replace with the correct channel ID
 
             // Correctly mention the user or role
             await channel.send(`<@&${notifyUserId}> someone has requested a withdrawal of roles.`);
@@ -63,7 +63,7 @@ module.exports = {
             const message = await channel.send({ embeds: [embed], components: [row] });
 
             // Role that is allowed to approve or reject the withdrawal
-            const requiredRoleName = 'JAG Command'; // Replace with the correct role name
+            const requiredRoleName = 'JAG Leadership'; // Replace with the correct role name
 
             const filter = i => ['approve_withdrawal', 'reject_withdrawal'].includes(i.customId);
             const collector = message.createMessageComponentCollector({ filter, time: 60000 });

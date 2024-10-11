@@ -42,7 +42,7 @@ module.exports = {
             const nominatedUser = interaction.options.getUser('user');
             const division = interaction.options.getString('division');
             const reasoning = interaction.options.getString('reasoning');
-            const notifyUserId = '964465282120830986'; // Replace with the correct user or role ID
+            const notifyUserId = '1275668326693208146'; // Replace with the correct user or role ID
 
             const embed = new EmbedBuilder()
                 .setTitle('Nomination for Prosecuting Authority Role')
@@ -67,7 +67,7 @@ module.exports = {
             const row = new ActionRowBuilder()
                 .addComponents(approveButton, rejectButton);
 
-            const channel = interaction.client.channels.cache.get('960952766350639157'); // Replace with the correct channel ID
+            const channel = interaction.client.channels.cache.get('1272800122601865256'); // Replace with the correct channel ID
 
             // Correctly mention the user or role
             await channel.send(`<@${notifyUserId}> someone has requested nomination roles.`);
@@ -75,7 +75,7 @@ module.exports = {
             const message = await channel.send({ embeds: [embed], components: [row] });
 
             // Role that is allowed to approve or reject the nomination
-            const requiredRoleName = 'JAG Command'; // Replace with the correct role name
+            const requiredRoleName = 'JAG Leadership'; // Replace with the correct role name
 
             const filter = i => ['approve_nomination', 'reject_nomination'].includes(i.customId);
             const collector = message.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 });
@@ -115,11 +115,11 @@ module.exports = {
                 await message.edit({ components: [disabledRow] });
             });
 
-            await interaction.reply({ content: 'Nomination submitted.', ephemeral: true });
+            await interaction.editReply({ content: 'Nomination submitted.', ephemeral: true });
 
         } catch (error) {
             console.error('Error handling nomination:', error);
-            await interaction.reply({ content: 'There was an error while processing your nomination.', ephemeral: true });
+            await interaction.editReply({ content: 'There was an error while processing your nomination.', ephemeral: true });
         }
     },
 };

@@ -206,7 +206,7 @@ module.exports = {
             const message = await channel.send({ embeds: [embed], components: [row] });
 
             //Role perms to approve or deny the add_case
-            const requiredRoleIds = ['1008740665905131552', '964465282120830986'];
+            const requiredRoleIds = ['1275671875216867398', '1275671964324728833'];
 
             const filter = i => ['approve_case', 'reject_case'].includes(i.customId);
             const collector = message.createMessageComponentCollector({ filter, time: 60000 });
