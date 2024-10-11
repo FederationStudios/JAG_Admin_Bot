@@ -114,7 +114,7 @@ module.exports = {
                         );
                     await i.message.edit({ components: [updatedRow] });
 
-                    await i.reply({ content: 'The appeal has been forwarded to the Military Police.', ephemeral: true });
+                    await i.reply({ content: 'The appeal has been forwarded to the Military Police server.', ephemeral: true });
                 } else {
                     await i.reply({ content: 'Error: MP channel not found.', ephemeral: true });
                 }
