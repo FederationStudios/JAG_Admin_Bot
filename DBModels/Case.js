@@ -29,6 +29,7 @@ const caseSchema = new mongoose.Schema({
       'Military Training Academy',
       'Quartermaster',
       'Administrative & Community Services',
+      'Military Wide'
     ],
   },
   prosecuting_authority: {
