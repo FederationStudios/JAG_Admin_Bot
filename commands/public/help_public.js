@@ -7,7 +7,7 @@ module.exports = {
   name: "help_public",
   description: "List of all commands with the description of what they do.",
   data: new SlashCommandBuilder()
-    .setName("help")
+    .setName("help_public")
     .setDescription("List of all commands with the description of what they do."),
   /**
    * @param {Client} client
