@@ -4,7 +4,7 @@ const fs = require("fs");
 const { join } = require("path");
 
 module.exports = {
-  name: "help",
+  name: "help_public",
   description: "List of all commands with the description of what they do.",
   data: new SlashCommandBuilder()
     .setName("help")
