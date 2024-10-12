@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, CommandInteractionOptionResolver, Client } = require('discord.js');
+const { SlashCommandBuilder, CommandInteractionOptionResolver, CommandInteraction, Colors } = require('discord.js');
 const Judgment = require('../../DBModels/Judgment.js'); // Adjust path if necessary
 const Case = require('../../DBModels/Case.js'); // To validate if case exists
 const { interactionEmbed } = require('../../functions.js');
@@ -26,8 +26,8 @@ module.exports = {
      * @param {CommandInteractionOptionResolver} options
      */
     run: async (interaction, client, options) => {
-        const caseId = interaction.options.getString('case_id');
-        const resultDocLink = interaction.options.getString('result_doc_link');
+        const caseId = options.getString('case_id');
+        const resultDocLink = options.getString('result_doc_link');
 
         // Defer reply in case of long operation
         await interaction.deferReply({ ephemeral: true });
