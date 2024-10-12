@@ -30,7 +30,7 @@ module.exports = {
         const resultDocLink = options.getString('result_doc_link');
 
         // Defer reply in case of long operation
-        await interaction.deferReply({ ephemeral: true });
+        
         const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
         if (!hasRole) {
         return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
@@ -40,7 +40,7 @@ module.exports = {
             // Check if the case exists before submitting results
             const existingCase = await Case.findOne({ case_id: caseId });
             if (!existingCase) {
-                return interaction.editReply({ content: `No case found with ID ${caseId}`, ephemeral: true });
+                return interaction.reply({ content: `No case found with ID ${caseId}`, ephemeral: true });
             }
 
             // Create or update the judgment record
@@ -51,10 +51,10 @@ module.exports = {
             );
 
             // Send success message
-            await interaction.editReply({ content: `The results for case ID ${caseId} have been successfully submitted.`, ephemeral: true });
+            await interaction.reply({ content: `The results for case ID ${caseId} have been successfully submitted.`, ephemeral: true });
         } catch (error) {
             console.error('Error submitting case results:', error);
-            await interaction.editReply({ content: 'An error occurred while submitting the case results.', ephemeral: true });
+            await interaction.reply({ content: 'An error occurred while submitting the case results.', ephemeral: true });
         }
     },
 };
