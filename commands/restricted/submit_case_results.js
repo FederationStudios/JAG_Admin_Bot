@@ -40,7 +40,7 @@ module.exports = {
             // Check if the case exists before submitting results
             const existingCase = await Case.findOne({ case_id: caseId });
             if (!existingCase) {
-                return interaction.reply({ content: `No case found with ID ${caseId}`, ephemeral: true });
+                return interaction.editReply({ content: `No case found with ID ${caseId}`, ephemeral: true });
             }
 
             // Create or update the judgment record
