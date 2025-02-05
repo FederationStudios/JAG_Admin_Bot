@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Define the schema for the case
 const caseSchema = new mongoose.Schema({
   case_id: {
     type: String,
@@ -47,10 +46,9 @@ const caseSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      'Summary Court Martial',
-      'General Court Martial',
-      'Special Court Martial',
-      'Appeal against a Summary Court Martial decision'
+      'Summary Appeal Court',
+      'General Appeal Court',
+      'Appeal Tribunal',
     ],
   },
   offenses_adjudicated: {
@@ -85,7 +83,6 @@ const caseSchema = new mongoose.Schema({
   }
 });
 
-// Create a model from the schema
 const Case = mongoose.model('Case', caseSchema);
 
 module.exports = Case;
