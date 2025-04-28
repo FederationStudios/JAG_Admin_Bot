@@ -53,7 +53,7 @@ module.exports = {
         try {
             await interaction.deferReply({ ephemeral: true });
 
-            if (interaction.channel.id !== "1266061997242585289") {
+            if (interaction.channel.id !== "1272170550730690592") {
                 return await interaction.editReply({ content: "This command can only be used in <#1272170550730690592>", ephemeral: true });
             }
 
