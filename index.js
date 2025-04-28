@@ -9,11 +9,11 @@ const {
   EmbedBuilder,
   Options
 } = require("discord.js");
+const { startHealthMonitor } = require('./healthMonitor.js');
 const { ApplicationCommandOptionType } = require("discord-api-types/v10");
 const { interactionEmbed, toConsole } = require("./functions.js");
 const fs = require("node:fs");
 const config = require("./config.json");
-const noblox = require("noblox.js");
 const mongoose = require('mongoose');
 const path = require("path");
 let ready = false;
@@ -65,10 +65,7 @@ const BYPASS_CHANNELS = [
 ];
 
 
-// Enhanced Roblox authentication
-const ROBLOX_REFRESH_STRATEGIES = [
-  { method: 'cookie', key: 'cookie' }
-];
+
 
 // Removed all command rate limit related code and maps
 
@@ -100,62 +97,6 @@ function setupCacheCleanup() {
     // Removed rate limit cleanup
     
   }, 300000); // Run cleanup every 5 minutes
-}
-
-async function enhancedAuthentication() {
-  const currentTime = Date.now();
-  
-  for (const strategy of ROBLOX_REFRESH_STRATEGIES) {
-    try {
-      // Check if the required configuration exists
-      if (!config.roblox || !config.roblox[strategy.key]) {
-        console.warn(`Missing Roblox ${strategy.key} configuration`);
-        continue;
-      }
-
-      switch(strategy.method) {
-        case 'cookie': {
-          const cookie = config.roblox[strategy.key];
-          if (!cookie) {
-            console.warn('Roblox cookie is empty or undefined');
-            continue;
-          }
-          await noblox.setCookie(cookie);
-          console.log('Successfully authenticated with Roblox');
-          
-          // Verify authentication
-          const currentUser = await noblox.getAuthenticatedUser();
-          console.log(`Logged in as ${currentUser.name} (${currentUser.id})`);
-          
-          return;
-        }
-        default:
-          console.warn(`Unsupported authentication method: ${strategy.method}`);
-      }
-    } catch (error) {
-      console.error(`Authentication failed with ${strategy.method}:`, error);
-    }
-  }
-  
-  throw new Error('All authentication strategies failed');
-}
-
-// Initial Roblox login with improved retry logic
-async function startNoblox(retries = 3, delay = 5000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      await enhancedAuthentication();
-      return true; // Success
-    } catch (error) {
-      console.error(`Attempt ${i + 1}/${retries} failed to initialize Roblox connection:`, error);
-      if (i < retries - 1) {
-        console.log(`Retrying in ${delay/1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-  console.error('Failed to initialize Roblox connection after multiple attempts');
-  return false; // Indicate failure but don't throw, allowing bot to continue without Roblox
 }
 
 // Database connection with improved retry mechanism and limits
@@ -279,11 +220,10 @@ client.once("ready", async () => {
   try {
     // Bot Status with efficient rotation (less frequent)
     const activities = [
-      "Syrian Politic's brain!",
+      "Checking Appeals",
+      "Watching Larz",
       "Suman is sleeping",
-      "Ally is not doin his job",
-      "Staff went on vacation",
-      "OiTs are crying"
+      "People Abusing"
     ];
   
     // Use less frequent status updates to save resources
@@ -295,16 +235,15 @@ client.once("ready", async () => {
     }, 14400000); // Change every 4 hours instead of every hour
       
     // Initialize services
-    const [robloxOk, dbOk] = await Promise.all([
-      startNoblox(),
+    const [dbOk] = await Promise.all([
       connectDatabase(),
       loadModals(), // Added modal loading
       setupCacheCleanup(), // Added memory cleanup
       setupGracefulShutdown() // Added graceful shutdown
     ]);
-    
+    startHealthMonitor(client);
     // Log service status
-    console.log(`Services status: Roblox: ${robloxOk ? 'OK' : 'Failed'}, Database: ${dbOk ? 'OK' : 'Limited functionality'}`);
+    console.log(`Services status: Database: ${dbOk ? 'OK' : 'Limited functionality'}`);
 
     // Command loading with improved error handling
     const loadCommands = (folderPath, type) => {
@@ -389,10 +328,6 @@ client.on("interactionCreate", async interaction => {
       const command = client.commands.get(interaction.commandName);
       if (!command) return;
       
-      // Try to authenticate with Roblox if needed before handling command
-      if (command.requiresRoblox) {
-        await enhancedAuthentication();
-      }
       
       await handleCommand(command, interaction);
     } else if (interaction.type === InteractionType.ModalSubmit) {
