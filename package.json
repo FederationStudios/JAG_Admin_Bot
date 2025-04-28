@@ -1,0 +1,19 @@
+{
+  "name": "jag_administration_bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "discord.js": "^14.19.1",
+    "mongoose": "^8.14.0",
+    "noblox.js": "^6.1.1",
+    "node-fetch": "^2.6.7"
+  }
+}

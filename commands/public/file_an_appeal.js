@@ -91,7 +91,7 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(forwardButton);
 
-            const logChannel = interaction.client.channels.cache.get('1268816747696226335');
+            const logChannel = interaction.client.channels.cache.get('1272142489423314964');
             await logChannel.send({ 
                 embeds: [embed], 
                 components: [row], 
@@ -105,10 +105,10 @@ module.exports = {
             const collector = logChannel.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 }); // 7 days
 
             collector.on('collect', async i => {
-                const mjlChannel = interaction.client.channels.cache.get('1265982268162183178');
+                const mjlChannel = interaction.client.channels.cache.get('1365895646694871040');
                 if (mjlChannel) {
                     await mjlChannel.send({
-                        content: `<@&1139641077796716614> <@&898181248751640676> New appeal forwarded for review.`,
+                        content: `<@&1300664494720028712> New appeal forwarded for review.`,
                         embeds: [embed]
                     });
 

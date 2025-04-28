@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 // Configuration
 const CHECK_INTERVAL = 10 * 60 * 1000; // Every 10 minutes
-const HEALTH_LOG_CHANNEL_ID = '1265982268162183178'; // Replace with your log channel ID
+const HEALTH_LOG_CHANNEL_ID = '1272142426252906546'; // Replace with your log channel ID
 
 async function startHealthMonitor(client) {
     if (!client || !client.isReady()) {
@@ -23,7 +23,7 @@ async function startHealthMonitor(client) {
                 mongoStatus = '🟡 Connecting';
             }
 
-            const discordStatus = client.ws.status === 0 ? '✅ Connected' : '❌ Not Connected';
+            const discordStatus = getDiscordStatus(client.ws.status);
             const uptime = formatUptime(client.uptime);
 
             const embed = new EmbedBuilder()
@@ -36,7 +36,7 @@ async function startHealthMonitor(client) {
                 )
                 .setTimestamp();
 
-            const logChannel = client.channels.cache.get(HEALTH_LOG_CHANNEL_ID);
+            const logChannel = await client.channels.fetch(HEALTH_LOG_CHANNEL_ID).catch(() => null);
             if (logChannel) {
                 await logChannel.send({ embeds: [embed] });
             } else {
@@ -48,6 +48,15 @@ async function startHealthMonitor(client) {
             console.error('[HEALTH] Error during health check:', error);
         }
     }, CHECK_INTERVAL);
+}
+
+function getDiscordStatus(status) {
+    switch (status) {
+        case 0: return '✅ Connected';
+        case 1: return '🟡 Reconnecting';
+        case 2: return '🟡 Connecting';
+        default: return '❌ Not Connected';
+    }
 }
 
 function formatUptime(ms) {

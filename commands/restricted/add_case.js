@@ -195,10 +195,10 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(approveButton, rejectButton);
 
-            const channel = interaction.client.channels.cache.get('1265982268162183178');
+            const channel = interaction.client.channels.cache.get('1272800122601865256');
             const message = await channel.send({ embeds: [embed], components: [row] });
 
-            const requiredRoleIds = ['964465282120830986', '1272510518036529233'];
+            const requiredRoleIds = ['1269384517622169660', '1275671964324728833'];
 
             const filter = i => ['approve_case', 'reject_case'].includes(i.customId);
             const collector = message.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 });

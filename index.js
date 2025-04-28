@@ -241,7 +241,8 @@ client.once("ready", async () => {
       setupCacheCleanup(), // Added memory cleanup
       setupGracefulShutdown() // Added graceful shutdown
     ]);
-    startHealthMonitor(client);
+       // ✅ Now AFTER all services
+       startHealthMonitor(client);
     // Log service status
     console.log(`Services status: Database: ${dbOk ? 'OK' : 'Limited functionality'}`);
 
@@ -278,9 +279,11 @@ client.once("ready", async () => {
 
     const cmdPublicDir = path.join(__dirname, "commands", "public");
     const cmdRestrictedDir = path.join(__dirname, "commands", "restricted");
+    const cmdMPDir = path.join(__dirname, "commands", "militarypolice");
     
     const globalCommands = loadCommands(cmdPublicDir, "PUBLIC");
     const oaCommands = loadCommands(cmdRestrictedDir, "STAFF");
+    const mpCommands = loadCommands(cmdMPDir, "MP");
 
     try {
       await client.application.commands.set(globalCommands);
@@ -290,12 +293,22 @@ client.once("ready", async () => {
     }
     
     try {
-      const mainGuild = client.guilds.cache.get("960952766350639154");
+      // Set restricted commands for the main guild
+      const mainGuild = client.guilds.cache.get("1267844279129341994");
       if (mainGuild) {
         await mainGuild.commands.set(oaCommands);
-        console.log(`[CMD-LOAD] Set ${oaCommands.length} guild-specific commands`);
+        console.log(`[CMD-LOAD] Set ${oaCommands.length} guild-specific commands (STAFF)`);
       } else {
         console.error('[CMD-LOAD] Main guild not found');
+      }
+
+      // Set MP commands for the MP guild
+      const mpGuild = client.guilds.cache.get("1300635431418855515");
+      if (mpGuild) {
+        await mpGuild.commands.set([...oaCommands, ...mpCommands]);
+        console.log(`[CMD-LOAD] Set ${oaCommands.length + mpCommands.length} MP guild-specific commands`);
+      } else {
+        console.error('[CMD-LOAD] MP guild not found');
       }
     } catch (error) {
       console.error('[CMD-LOAD] Failed to set guild commands:', error);
