@@ -255,7 +255,7 @@ const errors = {
  */
   const getRowifi = async (user, client) => {
     if (!user) return { success: false, error: "No username provided" };
-    const userData = await fetch(`https://api.rowifi.xyz/v2/guilds/${config.discord.mainServer}/members/${user}`, { headers: { "Authorization": `Bot ${config.rowifiApiKey}` } })
+    const userData = await fetch(`https://api.rowifi.xyz/v2/guilds/${config.discord.mainServer}/members/${user}`, { headers: { "Authorization": `Bot ${config.bot.rowifiApiKey}` } })
       .then(res => {
         if (!res.ok) {
           if (res.status !== 404) module.exports.toConsole(`Rowifi API returned ${res.status} ${res.statusText}`, new Error().stack, client);
@@ -294,10 +294,11 @@ const errors = {
  */
   const paginationEmbed = async function (interaction, embeds) {
     let allbuttons = new ActionRowBuilder().addComponents([
-      new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("1").setLabel("◀"),
-      new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("2").setLabel("❌"),
-      new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("3").setLabel("▶"),
+        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("prev").setLabel("◀"),
+        new ButtonBuilder().setStyle(ButtonStyle.Danger).setCustomId("close").setLabel("❌"),
+        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("next").setLabel("▶"),
     ]);
+
     if (embeds.length === 1) {
       if (interaction.deferred) {
         return interaction.followUp({
@@ -331,7 +332,7 @@ const errors = {
       });
     }
 
-    let filter = (m) => m.member.id === interaction.member.id;
+    const filter = (btnInteraction) => btnInteraction.user.id === interaction.user.id;
 
     const collector = await sendMsg.createMessageComponentCollector({
       filter: filter,
@@ -343,7 +344,7 @@ const errors = {
         await b.deferUpdate().catch((e) => null);
         // page first
         switch (b.customId) {
-          case "1":
+          case "prev":      
             {
               if (currentPage != 0) {
                 currentPage -= 1;
@@ -364,7 +365,7 @@ const errors = {
               }
             }
             break;
-          case "2":
+            case "close":
             {
               allbuttons.components.forEach((btn) => btn.setDisabled(true));
               await sendMsg
@@ -375,7 +376,7 @@ const errors = {
                 .catch((e) => null);
             }
             break;
-          case "3":
+            case "next":
             {
               if (currentPage < embeds.length - 1) {
                 currentPage++;

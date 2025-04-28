@@ -5,11 +5,12 @@ const judgmentSchema = new mongoose.Schema({
   case_id: {
     type: String,
     required: true,
-    unique: true, // Ensures each case_id has only one judgment document
+    unique: true, 
   },
   result_doc_link: {
     type: String,
-    required: true, // Link to the Google Doc for the judgment
+    required: true,
+    match: /^https?:\/\/.+/  // Must be a valid http or https link
   },
   submitted_date: {
     type: Date,

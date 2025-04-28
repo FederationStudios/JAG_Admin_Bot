@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
-const Case = require('../../DBModels/Case'); // Adjust the path to your case model
+const Case = require('../../DBModels/Case'); 
 const { interactionEmbed } = require("../../functions");
 const { requiredRoles } = require('../../config.json').discord;
 
@@ -31,8 +31,10 @@ module.exports = {
                         { name: 'Military Police', value: 'Military Police' },
                         { name: 'Military Training Academy', value: 'Military Training Academy' },
                         { name: 'Quartermaster', value: 'Quartermaster' },
-                        { name: 'Administrative & Community Services', value: 'Administrative & Community Services' }
+                        { name: 'Administrative & Community Services', value: 'Administrative & Community Services' },
+                        { name: 'Military Wide', value: 'Military Wide' }
                     )))
+
         .addSubcommand(subcommand =>
             subcommand
                 .setName("prosecuting_authority")
@@ -52,24 +54,25 @@ module.exports = {
                         { name: 'High Command', value: 'High Command' },
                         { name: 'Supreme Command', value: 'Supreme Command' }
                     )))
+
         .addSubcommand(subcommand =>
             subcommand
-                .setName("court_martial_type")
-                .setDescription("Edit the court martial type for a case.")
+                .setName("appeal_type")
+                .setDescription("Edit the appeal type for a case.") // UPDATED here
                 .addStringOption(option => option
                     .setName("case_id")
                     .setDescription("The ID of the case to edit.")
                     .setRequired(true))
                 .addStringOption(option => option
-                    .setName("new_court_martial_type")
-                    .setDescription("The new court martial type.")
+                    .setName("new_appeal_type")
+                    .setDescription("The new appeal type.")
                     .setRequired(true)
                     .addChoices(
-                        { name: 'Summary Court Martial', value: 'Summary Court Martial' },
-                        { name: 'General Court Martial', value: 'General Court Martial' },
-                        { name: 'Special Court Martial', value: 'Special Court Martial' },
-                        { name: 'Appeal against a Summary Court Martial decision', value: 'Appeal against a Summary Court Martial decision' }
+                        { name: 'Summary Appeal Court', value: 'Summary Appeal Court' },
+                        { name: 'General Appeal Court', value: 'General Appeal Court' },
+                        { name: 'Appeal Tribunal', value: 'Appeal Tribunal' }
                     )))
+
         .addSubcommand(subcommand =>
             subcommand
                 .setName("offenses_adjudicated")
@@ -82,6 +85,7 @@ module.exports = {
                     .setName("new_offenses_adjudicated")
                     .setDescription("The new offenses adjudicated.")
                     .setRequired(true)))
+
         .addSubcommand(subcommand =>
             subcommand
                 .setName("case_status")
@@ -103,38 +107,34 @@ module.exports = {
                         { name: 'Case Ended', value: 'Case Ended' },
                         { name: 'Results Declared', value: 'Results Declared' }
                     ))),
+
     /**
      * @param {Client} client
      * @param {CommandInteraction} interaction
      * @param {CommandInteractionOptionResolver} options
      */
     run: async (client, interaction, options) => {
-
         await interaction.deferReply({ ephemeral: true });
+
         const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
         if (!hasRole) {
-        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+            return interactionEmbed(3, "[ERR-UPRM]", '', interaction, client, [true, 30]);
         }
+
         const subcommand = options.getSubcommand();
         const caseId = options.getString("case_id");
         let updateData = {};
 
-        // Process each subcommand and its corresponding field update
         if (subcommand === "division") {
-            const newDivision = options.getString("new_division");
-            updateData = { division: newDivision };
+            updateData.division = options.getString("new_division");
         } else if (subcommand === "prosecuting_authority") {
-            const newProsecutingAuthority = options.getString("new_prosecuting_authority");
-            updateData = { prosecuting_authority: newProsecutingAuthority };
-        } else if (subcommand === "court_martial_type") {
-            const newCourtMartialType = options.getString("new_court_martial_type");
-            updateData = { court_martial_type: newCourtMartialType };
+            updateData.prosecuting_authority = options.getString("new_prosecuting_authority");
+        } else if (subcommand === "appeal_type") {
+            updateData.appeal_type = options.getString("new_appeal_type"); // UPDATED here
         } else if (subcommand === "offenses_adjudicated") {
-            const newOffensesAdjudicated = options.getString("new_offenses_adjudicated");
-            updateData = { offenses_adjudicated: newOffensesAdjudicated };
+            updateData.offenses_adjudicated = options.getString("new_offenses_adjudicated");
         } else if (subcommand === "case_status") {
-            const newCaseStatus = options.getString("new_case_status");
-            updateData = { case_status: newCaseStatus };
+            updateData.case_status = options.getString("new_case_status");
         }
 
         try {
@@ -145,13 +145,13 @@ module.exports = {
             );
 
             if (caseDocument) {
-                interaction.editReply({ content: `${subcommand.replace('_', ' ')} updated successfully for case ID ${caseId}.`, ephemeral: true });
+                await interaction.editReply({ content: `✅ ${subcommand.replace('_', ' ')} updated successfully for case ID ${caseId}.`, ephemeral: true });
             } else {
-                interaction.editReply({ content: `Case with ID ${caseId} not found.`, ephemeral: true });
+                await interaction.editReply({ content: `❌ Case with ID ${caseId} not found.`, ephemeral: true });
             }
         } catch (error) {
             console.error(error);
-            interaction.editReply({ content: `An error occurred while updating the ${subcommand.replace('_', ' ')}.`, ephemeral: true });
+            await interaction.editReply({ content: `❌ An error occurred while updating the ${subcommand.replace('_', ' ')}.`, ephemeral: true });
         }
     }
 };

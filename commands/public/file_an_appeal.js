@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 
 module.exports = {
     name: 'file_an_appeal',
-    description: 'File an appeal for different court martial cases.',
+    description: 'File an appeal for different types of appeal courts.',
     data: new SlashCommandBuilder()
         .setName('file_an_appeal')
         .setDescription('File an appeal')
@@ -27,96 +27,104 @@ module.exports = {
                     { name: 'Administrative & Community Services', value: 'Administrative & Community Services' },
                 ))
         .addStringOption(option =>
-            option.setName('court_martial_type')
-                .setDescription('Select the court martial type')
+            option.setName('appeal_type')
+                .setDescription('Select the type of appeal')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'Summary Court Martial', value: 'Summary Court Martial' },
-                    { name: 'General Court Martial', value: 'General Court Martial' },
-                    { name: 'Special Court Martial', value: 'Special Court Martial' },
-                    { name: 'Appeal against a Summary Court Martial decision', value: 'Appeal against a Summary Court Martial decision' },
+                    { name: 'Summary Appeal Court', value: 'Summary Appeal Court' },
+                    { name: 'General Appeal Court', value: 'General Appeal Court' },
+                    { name: 'Appeal Tribunal', value: 'Appeal Tribunal' },
                 ))
         .addStringOption(option =>
             option.setName('offenses_adjudicated')
-                .setDescription('Description of the offenses adjudicated')
+                .setDescription('Describe the offenses or reason for appeal')
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('google_docs_link')
-                .setDescription('Attach the link file')
+                .setDescription('Google Docs link (required for Summary Appeal Court only)')
                 .setRequired(false)),
+    
     /**
      * @param {Client} client
      * @param {CommandInteraction} interaction
      * @param {CommandInteractionOptionResolver} options
-     */            
+     */
     run: async (client, interaction) => {
         try {
             await interaction.deferReply({ ephemeral: true });
 
-            if (interaction.channel.id !== "1272170550730690592") {
+            if (interaction.channel.id !== "1266061997242585289") {
                 return await interaction.editReply({ content: "This command can only be used in <#1272170550730690592>", ephemeral: true });
             }
 
             const subject = interaction.options.getString('subject');
             const prosecutingAuthority = interaction.options.getString('prosecuting_authority');
-            const courtMartialType = interaction.options.getString('court_martial_type');
+            const appealType = interaction.options.getString('appeal_type');
             const offensesAdjudicated = interaction.options.getString('offenses_adjudicated');
-            const linkAttachment = interaction.options.getString('google_docs_link') || 'No link provided';
+            const googleDocsLink = interaction.options.getString('google_docs_link');
+
+            if (appealType === 'Summary Appeal Court' && !googleDocsLink) {
+                return await interaction.editReply({ content: "You must provide a Google Docs link when appealing through the Summary Appeal Court.", ephemeral: true });
+            }
 
             const embed = new EmbedBuilder()
                 .setTitle('Appeal Filed')
                 .setColor(Colors.Red)
                 .addFields(
-                    { name: 'Discord Tag', value: interaction.user.tag },
-                    { name: 'Discord ID', value: interaction.user.id },
-                    { name: 'Subject', value: subject, inline: false },
-                    { name: 'Prosecuting Authority', value: prosecutingAuthority, inline: false },
-                    { name: 'Court Martial Type', value: courtMartialType, inline: false },
-                    { name: 'Offenses Adjudicated', value: offensesAdjudicated, inline: false },
-                    { name: 'Google Link', value: `[Click Here](${linkAttachment})`, inline: false }
+                    { name: 'Discord Tag', value: interaction.user.tag, inline: true },
+                    { name: 'Discord ID', value: interaction.user.id, inline: true },
+                    { name: 'Subject', value: subject },
+                    { name: 'Prosecuting Authority', value: prosecutingAuthority },
+                    { name: 'Appeal Type', value: appealType },
+                    { name: 'Offenses/Reason', value: offensesAdjudicated },
+                    { name: 'Google Docs Link', value: googleDocsLink ? `[Click Here](${googleDocsLink})` : 'Not provided' }
                 )
-                .setFooter({ text: `JAG - Secure Transmission | Filed at ${new Date().toLocaleTimeString()} ${new Date().toString().match(/GMT([+-]\d{2})(\d{2})/)[0]}`, iconURL: client.user.displayAvatarURL() });
+                .setFooter({ 
+                    text: `Filed at ${new Date().toLocaleTimeString()} | MJL Secure Transmission`, 
+                    iconURL: client.user.displayAvatarURL() 
+                });
 
             const forwardButton = new ButtonBuilder()
-                .setCustomId('forward_to_mp')
-                .setLabel('Forward to MP')
+                .setCustomId('forward_to_mjl')
+                .setLabel('Forward to MJL Command')
                 .setStyle(ButtonStyle.Primary);
 
-            const row = new ActionRowBuilder()
-                .addComponents(forwardButton);
+            const row = new ActionRowBuilder().addComponents(forwardButton);
 
-            const logChannel = interaction.client.channels.cache.get('1272800122601865256'); // Replace with the correct channel ID
-            await logChannel.send({ embeds: [embed], components: [row], content: `hi my dear noobs plz approve this <@&1275671964324728833>` });
+            const logChannel = interaction.client.channels.cache.get('1268816747696226335');
+            await logChannel.send({ 
+                embeds: [embed], 
+                components: [row], 
+                content: `<@&1275671964324728833> New appeal received. Please review.` 
+            });
             await interaction.user.send({ embeds: [embed] });
 
             await interaction.editReply({ content: 'Your appeal has been filed and sent to the appropriate channels.' });
 
-            // Button interaction handler
-            const filter = i => i.customId === 'forward_to_mp' && i.user.id === interaction.user.id;
-            const collector = logChannel.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 }); // 7 days for collector
+            const filter = i => i.customId === 'forward_to_mjl' && i.user.id === interaction.user.id;
+            const collector = logChannel.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+
             collector.on('collect', async i => {
-                const mpChannel = interaction.client.channels.cache.get('685141430691561473'); // Replace with the MP channel ID
-            
-                if (mpChannel) {
-                    await mpChannel.send({
-                        content: `Hi, my dear noobs new case incoming get ready oorah!!!!! evaluate and then file charges <@&1139641077796716614> <@&898181248751640676>`,
+                const mjlChannel = interaction.client.channels.cache.get('1265982268162183178');
+                if (mjlChannel) {
+                    await mjlChannel.send({
+                        content: `<@&1139641077796716614> <@&898181248751640676> New appeal forwarded for review.`,
                         embeds: [embed]
                     });
 
-                    // Update the original message to make the button invisible
                     const updatedRow = new ActionRowBuilder()
                         .addComponents(
                             new ButtonBuilder()
-                                .setCustomId('forward_to_mp')
-                                .setLabel('Forward to MP')
+                                .setCustomId('forward_to_mjl')
+                                .setLabel('Forward to MJL Command')
                                 .setStyle(ButtonStyle.Primary)
                                 .setDisabled(true)
                         );
                     await i.message.edit({ components: [updatedRow] });
 
-                    await i.reply({ content: 'The appeal has been forwarded to the Military Police server.', ephemeral: true });
+                    await i.reply({ content: 'The appeal has been forwarded to the Military Justice League Command.', ephemeral: true });
                 } else {
-                    await i.reply({ content: 'Error: MP channel not found.', ephemeral: true });
+                    await i.reply({ content: 'Error: MJL channel not found.', ephemeral: true });
                 }
             });
 

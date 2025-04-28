@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, CommandInteraction, Client } = require('discord.js');
-const Judgment = require('../../DBModels/Judgment.js'); // Adjust path if necessary
-const Case = require('../../DBModels/Case.js'); // To validate if case exists
+const Judgment = require('../../DBModels/Judgment.js');
+const Case = require('../../DBModels/Case.js');
 const { interactionEmbed } = require('../../functions.js');
 const { requiredRoles } = require('../../config.json').discord;
 
@@ -13,13 +13,11 @@ module.exports = {
         .addStringOption(option =>
             option.setName('case_id')
                 .setDescription('The ID of the case to submit results for.')
-                .setRequired(true)
-        )
+                .setRequired(true))
         .addStringOption(option =>
             option.setName('result_doc_link')
                 .setDescription('The Google Docs link of the summary judgment.')
-                .setRequired(true)
-        ),
+                .setRequired(true)),
     
     /**
      * @param {Client} client
@@ -34,28 +32,30 @@ module.exports = {
         const caseId = interaction.options.getString('case_id');
         const resultDocLink = interaction.options.getString('result_doc_link');
 
-        // Defer reply to give the bot time for processing
         await interaction.deferReply({ ephemeral: true });
 
+        // Validate link format
+        const urlPattern = /^https?:\/\/.+/;
+        if (!urlPattern.test(resultDocLink)) {
+            return interaction.editReply({ content: "❌ Please provide a valid Google Docs link starting with `http://` or `https://`.", ephemeral: true });
+        }
+
         try {
-            // Check if the case exists
             const existingCase = await Case.findOne({ case_id: caseId });
             if (!existingCase) {
-                return interaction.editReply({ content: `No case found with ID ${caseId}`, ephemeral: true });
+                return interaction.editReply({ content: `❌ No case found with ID **${caseId}**.`, ephemeral: true });
             }
 
-            // Create or update the judgment record
             await Judgment.updateOne(
                 { case_id: caseId },
                 { case_id: caseId, result_doc_link: resultDocLink, submitted_date: new Date() },
-                { upsert: true } // Create a new record if it doesn't exist
+                { upsert: true }
             );
 
-            // Send success message
-            await interaction.editReply({ content: `The results for case ID ${caseId} have been successfully submitted.`, ephemeral: true });
+            await interaction.editReply({ content: `✅ The results for case ID **${caseId}** have been successfully submitted.`, ephemeral: true });
         } catch (error) {
             console.error('Error submitting case results:', error);
-            await interaction.editReply({ content: 'An error occurred while submitting the case results.', ephemeral: true });
+            return interaction.editReply({ content: '❌ An error occurred while submitting the case results.', ephemeral: true });
         }
     },
 };

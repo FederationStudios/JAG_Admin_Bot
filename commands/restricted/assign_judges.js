@@ -21,7 +21,7 @@ module.exports = {
                 .setRequired(true))
         .addStringOption(option => 
             option.setName('judges_username')
-                .setDescription('The username of the assigned judges (if any)')
+                .setDescription('The usernames of the assigned judges (comma-separated if multiple)')
                 .setRequired(false)),
     /**
      * @param {Client} client
@@ -29,34 +29,37 @@ module.exports = {
      * @param {CommandInteractionOptionResolver} options
      */
     run: async(client, interaction, options) => {
-
-        await interaction.deferReply({ephemeral:true});
+        await interaction.deferReply({ ephemeral: true });
 
         const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
         if (!hasRole) {
-        return interactionEmbed(3, "[ERR-UPRM]",'', interaction, client, [true, 30]);
+            return interactionEmbed(3, "[ERR-UPRM]", '', interaction, client, [true, 30]);
         }
 
         const caseId = interaction.options.getString('case_id');
         const judgesAssigned = interaction.options.getBoolean('judges_assigned');
-        const judgesUsername = interaction.options.getString('judges_username') || 'N/A';
+        const judgesUsernameInput = interaction.options.getString('judges_username') || '';
 
         try {
-            // Find the case and update its judges information
+            // Process judgesUsername into array if assigned
+            const judgesUsernameArray = judgesAssigned && judgesUsernameInput
+                ? judgesUsernameInput.split(',').map(name => name.trim())
+                : [];
+
             const result = await case_list.findOneAndUpdate(
                 { case_id: caseId },
                 { 
                     $set: { 
                         case_status: 'Accepted',
                         judges_assigned: judgesAssigned,
-                        judges_username: judgesAssigned ? judgesUsername : 'N/A'
+                        judges_username: judgesUsernameArray
                     }
                 },
                 { new: true } // Return the updated document
             );
 
             if (!result) {
-                return interaction.reply({ content: `No case found with ID ${caseId}.`, ephemeral: true });
+                return interaction.editReply({ content: `No case found with ID ${caseId}.`, ephemeral: true });
             }
 
             await interaction.editReply({ content: `The case with ID ${caseId} has been updated successfully.`, ephemeral: true });

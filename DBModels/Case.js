@@ -10,9 +10,9 @@ const caseSchema = new mongoose.Schema({
     iv: { type: String, required: true },
     encryptedData: { type: String, required: true }
   },
- discord_username: {
-  iv: { type: String, required: true },
-  encryptedData: { type: String, required: true }
+  discord_username: {
+    iv: { type: String, required: true },
+    encryptedData: { type: String, required: true }
   },
   division: {
     type: String,
@@ -42,7 +42,7 @@ const caseSchema = new mongoose.Schema({
       'Supreme Command'
     ],
   },
-  court_martial_type: {
+  appeal_type: { 
     type: String,
     required: true,
     enum: [
@@ -59,9 +59,9 @@ const caseSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  judges_username: {
-    type: String,
-    default: '',
+  judges_username: { 
+    type: [String],
+    default: [],
   },
   submission_date: {
     type: Date,
@@ -80,7 +80,7 @@ const caseSchema = new mongoose.Schema({
       'Results Declared'
     ],
     default: 'Pending',
-  }
+  },
 });
 
 const Case = mongoose.model('Case', caseSchema);

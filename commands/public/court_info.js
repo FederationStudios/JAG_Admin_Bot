@@ -1,64 +1,82 @@
-const { SlashCommandBuilder, Client, CommandInteraction, Colors } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, Colors } = require("discord.js");
+const { paginationEmbed } = require("../../functions");
 
 module.exports = {
-    name: 'court_info',
-    description: 'Provides information about military court martials and sanctions',
+    name: "court_info",
+    description: "Info about military court martials and appeal processes.",
     data: new SlashCommandBuilder()
-        .setName('court_info')
-        .setDescription('Provides information about military court martials and sanctions'),
-    /**
-     * @param {Client} client
-     * @param {CommandInteraction} interaction
-     */         
+        .setName("court_info")
+        .setDescription("Info about military court martials and appeal processes."),
     run: async (client, interaction) => {
         try {
-            const embed = {
-                title: 'Military Court Martials and Sanctions',
-                color: Colors.Red,
-                fields: [
-                    {
-                        name: 'Sanctions',
-                        value: `Formal corrective actions like Counseling, Admonishment, Additional Duty, Rank Reduction, or Reassignment. Not appealable but can request a court martial instead.`,
-                    },
-                    {
-                        name: 'Summary Court Martial',
-                        value: `Handles Class I & II offenses up to Colonel. Punishments: Hell Jacks, Grammar Jacks, Demotion, Rank Lock, Division Removal, Additional Duty, Jail Time.`,
-                    },
-                    {
-                        name: 'Appeal against Summary Court Martial',
-                        value: `Appeal to Summary Appeal Court. Can uphold, reverse, or impose new sentences.`,
-                    },
-                    {
-                        name: 'General Court Martial',
-                        value: `Handles Class III offenses & certain Class II offenses. Punishments: Hell Jacks, Grammar Jacks, Unlimited Demotion, Blacklists, Decommissioning, Jail Time.`,
-                    },
-                    {
-                        name: 'General Appeal Court',
-                        value: `Hears appeals from General Court Martials. Can uphold, reverse, impose new sentences, or order a retrial.`,
-                    },
-                    {
-                        name: 'Special Court Martial',
-                        value: `Handles special cases. Unlimited in punishment within Armed Forces powers.`,
-                    },
-                    {
-                        name: 'Court of Appeals',
-                        value: `Overarching court for civilian and military appeals, including those from Summary and General Appeal Courts.`,
-                    },
-                ],
-                footer: {
-                  text: `Requested by ${interaction.member.user.username}`,
-                  iconUrl: interaction.user.displayAvatarURL()
-                },
-                timestamp: new Date()
-            };
+            const embeds = [
+                new EmbedBuilder()
+                    .setTitle("Military Justice League & Court Information (Page 1)")
+                    .setColor(Colors.Red)
+                    .addFields(
+                        {
+                            name: "Military Justice League",
+                            value: "The Military Justice League hears appeals submitted by current or former members of the Military. Trials are private, and only involved parties may participate.",
+                        },
+                        {
+                            name: "Summary Appeal Court",
+                            value: "**Handles Class I offenses only.** Appeals require a detailed document submitted via `/file_an_appeal`. Alternatively, Class I offenses may also be appealed through the General Appeal Court.",
+                        },
+                        {
+                            name: "General Appeal Court",
+                            value: "**Handles all appeals not involving court decisions.** No document is required; a trial will be held. If you were not provided with evidence, you may request it during the pre-trial once added to the ticket.",
+                        }
+                    ),
+                new EmbedBuilder()
+                    .setTitle("Military Justice League & Court Information (Page 2)")
+                    .setColor(Colors.Red)
+                    .addFields(
+                        {
+                            name: "Appeal Tribunal",
+                            value: "**Handles appeals of Military Justice League decisions only.** All qualified judges are assigned, and the trial proceeds without the appellee being present. The appeal process is similar to that of a general appeal.",
+                        },
+                        {
+                            name: "Submitting an Appeal",
+                            value: "To submit an appeal, head over to `#request-info` and run the `/file_an_appeal` command. Note: a `google_docs_link` is only required for Summary Appeal Court cases.",
+                        }
+                    ),
+                new EmbedBuilder()
+                    .setTitle("Military Justice League & Court Information (Page 3)")
+                    .setColor(Colors.Red)
+                    .addFields(
+                        {
+                            name: "You Can't Appeal If:",
+                            value: `
+- You are pleading guilty but the offense occurred **less than 30 days ago**.
+- Your punishment was issued by **military or group leadership**.
+- The **Court of Appeals** denied your appeal for the offense.
+- The **Military Justice League** denied your appeal (you must appeal the MJL decision itself).
+- Your punishment was a **verbal warning** or referral, unless the referral resulted in further punishments.
+- Military or group leadership prevents you from appealing.`,
+                        }
+                    ),
+                new EmbedBuilder()
+                    .setTitle("Military Justice League & Court Information (Page 4)")
+                    .setColor(Colors.Red)
+                    .addFields({
+                        name: "Questions or Violations",
+                        value: "If you believe a member of the office violated the rules or you have evidence, please message any member of the **Military Justice League Command (DJAG+)** or a **Court Administrator**.",
+                    }),
+            ];
 
-            await interaction.reply({ embeds: [embed], ephemeral: false });
+            await paginationEmbed(interaction, embeds);
         } catch (error) {
-            console.error('Error handling interaction:', error);
+            console.error("Error handling interaction:", error);
             if (!interaction.replied) {
-                await interaction.reply({ content: 'There was an error while processing your request.', ephemeral: true });
+                await interaction.reply({
+                    content: "There was an error while processing your request.",
+                    ephemeral: true,
+                });
             } else {
-                await interaction.followUp({ content: 'An error occurred while processing your request.', ephemeral: true });
+                await interaction.followUp({
+                    content: "An error occurred while processing your request.",
+                    ephemeral: true,
+                });
             }
         }
     },
