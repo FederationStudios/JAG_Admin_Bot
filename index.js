@@ -241,8 +241,6 @@ client.once("ready", async () => {
       setupCacheCleanup(), // Added memory cleanup
       setupGracefulShutdown() // Added graceful shutdown
     ]);
-       // ✅ Now AFTER all services
-       startHealthMonitor(client);
     // Log service status
     console.log(`Services status: Database: ${dbOk ? 'OK' : 'Limited functionality'}`);
 
