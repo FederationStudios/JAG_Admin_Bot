@@ -9,7 +9,6 @@ const {
   EmbedBuilder,
   Options
 } = require("discord.js");
-const { startHealthMonitor } = require('./healthMonitor.js');
 const { ApplicationCommandOptionType } = require("discord-api-types/v10");
 const { interactionEmbed, toConsole } = require("./functions.js");
 const fs = require("node:fs");
