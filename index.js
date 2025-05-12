@@ -59,8 +59,8 @@ const MIN_ACCOUNT_AGE = 7 * 24 * 60 * 60 * 1000;
 const MAX_DB_RETRY_ATTEMPTS = 5; // Added to limit database retry attempts
 // Add bypass channels for spam detection
 const BYPASS_CHANNELS = [
-'993555935937175572',
-'908269617552715836'
+'1275331757020938293',
+'1272170550730690592'
 ];
 
 
