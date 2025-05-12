@@ -302,7 +302,7 @@ const errors = {
     if (embeds.length === 1) {
         // If there's only one page, no need for buttons
         return interaction.editReply({
-            embeds: [embeds[0]], // Use editReply instead of reply
+            embeds: [embeds[0]],
             ephemeral: true,
         });
     }
@@ -319,7 +319,7 @@ const errors = {
 
     // Send the initial message with the first embed and buttons
     const message = await interaction.editReply({
-        embeds: [embeds[currentPage]], // Use editReply instead of reply
+        embeds: [embeds[currentPage]],
         components: [allButtons],
     });
 
@@ -342,10 +342,14 @@ const errors = {
             return;
         }
 
-        await message.edit({
-            embeds: [embeds[currentPage]],
-            components: [allButtons],
-        });
+        try {
+            await message.edit({
+                embeds: [embeds[currentPage]],
+                components: [allButtons],
+            });
+        } catch (error) {
+            console.error("Error editing message:", error);
+        }
     });
 
     collector.on("end", async () => {
@@ -356,9 +360,17 @@ const errors = {
             new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("next").setLabel("▶").setDisabled(true)
         );
 
-        await message.edit({
-            components: [disabledButtons],
-        });
+        try {
+            await message.edit({
+                components: [disabledButtons],
+            });
+        } catch (error) {
+            if (error.code === 10008) {
+                console.warn("Message was deleted before it could be edited.");
+            } else {
+                console.error("Error disabling buttons:", error);
+            }
+        }
     });
   };
 
