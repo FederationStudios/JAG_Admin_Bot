@@ -102,7 +102,7 @@ module.exports = {
             await interaction.editReply({ content: 'Your appeal has been filed and sent to the appropriate channels.' });
 
             const filter = i => i.customId === 'forward_to_mjl' && i.user.id === interaction.user.id;
-            const collector = logChannel.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+            const collector = logChannel.createMessageComponentCollector({ filter, time: 7 * 24 * 60 * 60 * 1000 }); // 1 week timeout
 
             collector.on('collect', async i => {
                 const mjlChannel = interaction.client.channels.cache.get('1365895646694871040');
@@ -118,7 +118,7 @@ module.exports = {
                                 .setCustomId('forward_to_mjl')
                                 .setLabel('Forward to MJL Command')
                                 .setStyle(ButtonStyle.Primary)
-                                .setDisabled(true)
+                                .setDisabled(true) // Disable the button after use
                         );
                     await i.message.edit({ components: [updatedRow] });
 
@@ -128,9 +128,24 @@ module.exports = {
                 }
             });
 
-            collector.on('end', collected => {
+            collector.on('end', async collected => {
                 if (collected.size === 0) {
                     logChannel.send({ content: 'The forward button was not used.' });
+                }
+
+                // Disable the button after the timeout
+                const disabledRow = new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('forward_to_mjl')
+                            .setLabel('Forward to MJL Command')
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(true) // Disable the button
+                    );
+
+                const lastMessage = await logChannel.messages.fetch({ limit: 1 }).then(messages => messages.first());
+                if (lastMessage) {
+                    await lastMessage.edit({ components: [disabledRow] });
                 }
             });
 

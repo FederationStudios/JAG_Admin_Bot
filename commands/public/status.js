@@ -19,10 +19,18 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
 
         try {
-            const cases = await case_list.find();
+            const cases = await case_list.find({ 'discord_username.encryptedData': { $exists: true } });
 
             const userCases = cases.filter(caseItem => {
-                const decryptedDiscordUsername = decryptData(caseItem.discord_username.encryptedData, caseItem.discord_username.iv);
+                const decryptedDiscordUsername = caseItem.discord_username && caseItem.discord_username.encryptedData && caseItem.discord_username.iv
+                    ? decryptData(caseItem.discord_username.encryptedData, caseItem.discord_username.iv)
+                    : null;
+
+                if (!decryptedDiscordUsername) {
+                    console.warn(`Skipping case ID ${caseItem.case_id} due to missing or invalid discord_username data.`);
+                    return false;
+                }
+
                 return decryptedDiscordUsername === discordUsername;
             });
 
@@ -34,7 +42,7 @@ module.exports = {
                 .setColor(Colors.Red)
                 .setTitle(`Case ID: ${c.case_id}`)
                 .addFields(
-                    { name: 'Status', value: c.case_status, inline: true },
+                    { name: 'Status', value: c.case_status || 'N/A', inline: true },
                     { name: 'Judges Assigned', value: c.judges_assigned ? 'Yes' : 'No', inline: true },
                     { name: 'Judges Username(s)', value: (c.judges_username && Array.isArray(c.judges_username) && c.judges_username.length > 0) ? c.judges_username.join(', ') : 'N/A', inline: false }
                 )
@@ -45,8 +53,10 @@ module.exports = {
             );
 
             try {
-                for (const embed of embeds) {
-                    await interaction.user.send({ embeds: [embed] });
+                const batchSize = 5;
+                for (let i = 0; i < embeds.length; i += batchSize) {
+                    const batch = embeds.slice(i, i + batchSize);
+                    await interaction.user.send({ embeds: batch });
                 }
                 await interaction.editReply({ content: '✅ I have sent your case details to your DMs.', ephemeral: true });
             } catch (dmError) {
@@ -55,8 +65,8 @@ module.exports = {
             }
 
         } catch (error) {
-            console.error(error);
-            await interaction.editReply({ content: '❌ An error occurred while fetching your case details.', ephemeral: true });
+            console.error('Error fetching cases:', error);
+            await interaction.editReply({ content: '❌ An unexpected error occurred while fetching your case details. Please contact support.', ephemeral: true });
         }
     }
 };

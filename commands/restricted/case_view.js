@@ -16,7 +16,6 @@ module.exports = {
      * @param {CommandInteraction} interaction
      */
     run: async (client, interaction) => {
-        
         await interaction.deferReply({ ephemeral: true });
 
         const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
@@ -56,6 +55,8 @@ module.exports = {
 
                     if (caseData.judges_assigned && Array.isArray(caseData.judges_username) && caseData.judges_username.length > 0) {
                         caseInfo += `\n**Judges Username(s):** ${caseData.judges_username.join(', ')}`;
+                    } else {
+                        caseInfo += `\n**Judges Username(s):** None assigned`;
                     }
 
                     embed.addFields({ name: `Case ID: ${caseData.case_id}`, value: caseInfo });
@@ -68,7 +69,7 @@ module.exports = {
 
         } catch (error) {
             console.error(error);
-            return interactionEmbed(3, "[ERR-ARGS]", "An error occurred while fetching the records.", interaction, client, [true, 15]);
+            return interactionEmbed(3, "An error occurred while fetching the case records. Please try again later.", '', interaction, client, [true, 15]);
         }
     }
 };

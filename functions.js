@@ -293,124 +293,74 @@ const errors = {
  * @param {embeds} embeds
  */
   const paginationEmbed = async function (interaction, embeds) {
-    let allbuttons = new ActionRowBuilder().addComponents([
+    const allButtons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("prev").setLabel("◀"),
         new ButtonBuilder().setStyle(ButtonStyle.Danger).setCustomId("close").setLabel("❌"),
-        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("next").setLabel("▶"),
-    ]);
+        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("next").setLabel("▶")
+    );
 
     if (embeds.length === 1) {
-      if (interaction.deferred) {
-        return interaction.followUp({
-          embeds: [embeds[0]],
-        });
-      } else {
+        // If there's only one page, no need for buttons
         return interaction.reply({
-          embeds: [embeds[0]],
-          fetchReply: true,
+            embeds: [embeds[0]],
+            ephemeral: true,
         });
-      }
     }
 
-    embeds = embeds.map((embed, index) => {
-      return embed.setFooter({
-        text: `Page ${index + 1}/${embeds.length}`,
-        iconURL: interaction.guild.iconURL({ dynamic: true }),
-      });
+    // Add footer to each embed for page tracking
+    embeds = embeds.map((embed, index) =>
+        embed.setFooter({
+            text: `Page ${index + 1} of ${embeds.length}`,
+            iconURL: interaction.guild.iconURL({ dynamic: true }),
+        })
+    );
+
+    let currentPage = 0;
+
+    // Send the initial message with the first embed and buttons
+    const message = await interaction.reply({
+        embeds: [embeds[currentPage]],
+        components: [allButtons],
+        fetchReply: true,
+        ephemeral: true,
     });
-
-    let sendMsg;
-    if (interaction.deferred) {
-      sendMsg = await interaction.followUp({
-        embeds: [embeds[0]],
-        components: [allbuttons],
-      });
-    } else {
-      sendMsg = await interaction.reply({
-        embeds: [embeds[0]],
-        components: [allbuttons],
-      });
-    }
 
     const filter = (btnInteraction) => btnInteraction.user.id === interaction.user.id;
 
-    const collector = await sendMsg.createMessageComponentCollector({
-      filter: filter,
-      time: 30000,
+    const collector = message.createMessageComponentCollector({
+        filter,
+        time: 60000, // 1 minute timeout
     });
-    let currentPage = 0;
-    collector.on("collect", async (b) => {
-      if (b.isButton()) {
-        await b.deferUpdate().catch((e) => null);
-        // page first
-        switch (b.customId) {
-          case "prev":      
-            {
-              if (currentPage != 0) {
-                currentPage -= 1;
-                await sendMsg
-                  .edit({
-                    embeds: [embeds[currentPage]],
-                    components: [allbuttons],
-                  })
-                  .catch((e) => null);
-              } else {
-                currentPage = embeds.length - 1;
-                await sendMsg
-                  .edit({
-                    embeds: [embeds[currentPage]],
-                    components: [allbuttons],
-                  })
-                  .catch((e) => null);
-              }
-            }
-            break;
-            case "close":
-            {
-              allbuttons.components.forEach((btn) => btn.setDisabled(true));
-              await sendMsg
-                .edit({
-                  embeds: [embeds[currentPage]],
-                  components: [allbuttons],
-                })
-                .catch((e) => null);
-            }
-            break;
-            case "next":
-            {
-              if (currentPage < embeds.length - 1) {
-                currentPage++;
-                await sendMsg
-                  .edit({
-                    embeds: [embeds[currentPage]],
-                    components: [allbuttons],
-                  })
-                  .catch((e) => null);
-              } else {
-                currentPage = 0;
-                await sendMsg
-                  .edit({
-                    embeds: [embeds[currentPage]],
-                    components: [allbuttons],
-                  })
-                  .catch((e) => null);
-              }
-            }
-            break;
-          default:
-            break;
+
+    collector.on("collect", async (btnInteraction) => {
+        await btnInteraction.deferUpdate();
+
+        if (btnInteraction.customId === "prev") {
+            currentPage = currentPage > 0 ? currentPage - 1 : embeds.length - 1;
+        } else if (btnInteraction.customId === "next") {
+            currentPage = currentPage < embeds.length - 1 ? currentPage + 1 : 0;
+        } else if (btnInteraction.customId === "close") {
+            collector.stop();
+            return;
         }
-      }
+
+        await message.edit({
+            embeds: [embeds[currentPage]],
+            components: [allButtons],
+        });
     });
 
     collector.on("end", async () => {
-      allbuttons.components.forEach((btn) => btn.setDisabled(true));
-      await sendMsg
-        .edit({
-          embeds: [embeds[currentPage]],
-          components: [allbuttons],
-        })
-        .catch((e) => null);
+        // Disable buttons after the collector ends
+        const disabledButtons = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("prev").setLabel("◀").setDisabled(true),
+            new ButtonBuilder().setStyle(ButtonStyle.Danger).setCustomId("close").setLabel("❌").setDisabled(true),
+            new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("next").setLabel("▶").setDisabled(true)
+        );
+
+        await message.edit({
+            components: [disabledButtons],
+        });
     });
   };
 
