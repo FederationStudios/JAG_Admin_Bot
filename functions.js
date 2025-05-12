@@ -301,8 +301,8 @@ const errors = {
 
     if (embeds.length === 1) {
         // If there's only one page, no need for buttons
-        return interaction.reply({
-            embeds: [embeds[0]],
+        return interaction.editReply({
+            embeds: [embeds[0]], // Use editReply instead of reply
             ephemeral: true,
         });
     }
@@ -318,11 +318,9 @@ const errors = {
     let currentPage = 0;
 
     // Send the initial message with the first embed and buttons
-    const message = await interaction.reply({
-        embeds: [embeds[currentPage]],
+    const message = await interaction.editReply({
+        embeds: [embeds[currentPage]], // Use editReply instead of reply
         components: [allButtons],
-        fetchReply: true,
-        ephemeral: true,
     });
 
     const filter = (btnInteraction) => btnInteraction.user.id === interaction.user.id;
